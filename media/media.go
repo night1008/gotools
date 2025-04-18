@@ -129,6 +129,6 @@ func GetMediaThumbnail(file *os.File) ([]byte, error) {
 		}
 		return fileInfo, nil
 	default:
-		return nil, fmt.Errorf("unknown media extension %s", ext)
+		return nil, fmt.Errorf("unsupported media extension %s", ext)
 	}
 }

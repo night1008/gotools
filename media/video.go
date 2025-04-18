@@ -62,12 +62,15 @@ func GetMediaVideoInfo(file *os.File) (*MediaInfo, error) {
 		return nil, err
 	}
 	if len(videoInfoFromFfprobe.Streams) == 0 {
-		return nil, fmt.Errorf("vedio streams length is zero")
+		return nil, fmt.Errorf("video streams length is zero")
 	}
 
 	duration, err := strconv.ParseFloat(videoInfoFromFfprobe.Streams[0].Duration, 64)
 	if err != nil {
 		return nil, err
+	}
+	if videoInfoFromFfprobe.Streams[0].Width == 0 || videoInfoFromFfprobe.Streams[0].Height == 0 {
+		return nil, fmt.Errorf("video height or width is zero")
 	}
 
 	return &MediaInfo{

@@ -28,7 +28,7 @@ const (
 	ImageTypeAvif = ".avif"
 )
 
-const MediaImageThumbnailJpegQuality = 10 // jpeg 缩略图质量
+const MediaImageThumbnailJpegQuality = 20 // jpeg 缩略图质量
 
 // 获取图片信息
 func GetMediaImageInfo(file *os.File) (*MediaInfo, error) {
@@ -41,10 +41,9 @@ func GetMediaImageInfo(file *os.File) (*MediaInfo, error) {
 		return nil, fmt.Errorf("failed to decode image: %v", err)
 	}
 
-	ext := GetMediaExtension(file.Name())
 	var duration float64
-	switch ext {
-	case ImageTypeGif:
+	switch format {
+	case "gif":
 		if _, err := file.Seek(0, io.SeekStart); err != nil {
 			return nil, fmt.Errorf("failed to reset file pointer: %v", err)
 		}
@@ -61,6 +60,10 @@ func GetMediaImageInfo(file *os.File) (*MediaInfo, error) {
 		duration = totalDuration.Seconds()
 	}
 
+	if img.Width == 0 || img.Height == 0 {
+		return nil, fmt.Errorf("image height or width is zero")
+	}
+
 	return &MediaInfo{
 		Width:    img.Width,
 		Height:   img.Height,
@@ -71,11 +74,18 @@ func GetMediaImageInfo(file *os.File) (*MediaInfo, error) {
 
 // 获取图片缩略图
 func GetMediaImageThumbnail(file *os.File) ([]byte, error) {
-	ext := GetMediaExtension(file.Name())
+	_, format, err := image.DecodeConfig(file)
+	if err != nil {
+		return nil, fmt.Errorf("failed to decode image: %v", err)
+	}
+
+	if _, err := file.Seek(0, io.SeekStart); err != nil {
+		return nil, fmt.Errorf("failed to reset file pointer: %v", err)
+	}
 
 	var buf bytes.Buffer
-	switch ext {
-	case ImageTypeJpg, ImageTypeJpeg:
+	switch format {
+	case "jpg", "jpeg":
 		img, err := jpeg.Decode(file)
 		if err != nil {
 			return nil, err
@@ -85,20 +95,21 @@ func GetMediaImageThumbnail(file *os.File) ([]byte, error) {
 		}); err != nil {
 			return nil, err
 		}
-	case ImageTypePng:
+	case "png":
 		img, err := png.Decode(file)
 		if err != nil {
 			return nil, err
 		}
-		if err := jpeg.Encode(&buf, img, &jpeg.Options{
-			Quality: MediaImageThumbnailJpegQuality,
-		}); err != nil {
+		encoder := png.Encoder{
+			CompressionLevel: png.BestCompression,
+		}
+		if err := encoder.Encode(&buf, img); err != nil {
 			return nil, err
 		}
-	case ImageTypeGif:
+	case "gif":
 		return ExtractMediaGifImageFirstFrame(file)
 	default:
-		return nil, fmt.Errorf("unsupport get image type %s thumbnail", "")
+		return nil, fmt.Errorf("unsupport get image type %s thumbnail", format)
 	}
 
 	return buf.Bytes(), nil
