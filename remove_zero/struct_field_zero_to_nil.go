@@ -1,8 +1,8 @@
-package structfieldzerotonil
+package removezero
 
 import "reflect"
 
-func SetStructFieldZeroToNil(item interface{}, excludeFieldNames ...string) interface{} {
+func SetStructFieldZeroToNil(item interface{}, excludeFieldNamesMap map[string]struct{}) interface{} {
 	value := reflect.ValueOf(item)
 	if value.Kind() == reflect.Struct {
 		addr := reflect.New(value.Type())
@@ -14,11 +14,6 @@ func SetStructFieldZeroToNil(item interface{}, excludeFieldNames ...string) inte
 		panic("item must be pointer to struct")
 	}
 	value = value.Elem()
-
-	excludeFieldNamesMap := make(map[string]struct{}, len(excludeFieldNames))
-	for _, name := range excludeFieldNames {
-		excludeFieldNamesMap[name] = struct{}{}
-	}
 
 	for i := 0; i < value.NumField(); i++ {
 		field := value.Field(i)
