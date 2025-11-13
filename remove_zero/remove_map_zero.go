@@ -1,6 +1,6 @@
 package removezero
 
-func RemoveMapZeroNumValue(m map[string]interface{}, excludeKeysMap map[string]struct{}) (map[string]interface{}, error) {
+func RemoveMapZeroNumValue(m map[string]interface{}, excludeKeysMap map[string]struct{}) map[string]interface{} {
 	for k, v := range m {
 		if _, ok := excludeKeysMap[k]; ok {
 			continue
@@ -14,5 +14,5 @@ func RemoveMapZeroNumValue(m map[string]interface{}, excludeKeysMap map[string]s
 			}
 		}
 	}
-	return m, nil
+	return m
 }
