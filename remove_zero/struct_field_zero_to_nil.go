@@ -2,9 +2,11 @@ package removezero
 
 import "reflect"
 
-func SetStructFieldZeroToNil(item interface{}, excludeFieldNamesMap map[string]struct{}) interface{} {
+func SetStructFieldZeroToNil[T any](item T, excludeFieldNamesMap map[string]struct{}) T {
 	value := reflect.ValueOf(item)
+	var isStruct bool
 	if value.Kind() == reflect.Struct {
+		isStruct = true
 		addr := reflect.New(value.Type())
 		addr.Elem().Set(value)
 		value = addr
@@ -40,5 +42,8 @@ func SetStructFieldZeroToNil(item interface{}, excludeFieldNamesMap map[string]s
 		}
 	}
 
-	return value.Interface()
+	if isStruct {
+		return value.Interface().(T)
+	}
+	return item
 }
