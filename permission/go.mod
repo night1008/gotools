@@ -1,4 +1,4 @@
-module git.sofunny.io/data-analysis/gotools/permission
+module github.com/night1008/gotools/permission
 
 go 1.23.3
 

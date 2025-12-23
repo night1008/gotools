@@ -1,4 +1,4 @@
-module github.com/night1008/go-tools/gormx
+module github.com/night1008/gotools/gormx
 
 go 1.23.3
 
