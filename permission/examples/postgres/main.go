@@ -9,7 +9,7 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
-	"git.sofunny.io/data-analysis/gotools/permission"
+	"github.com/night1008/gotools/permission"
 )
 
 func main() {
